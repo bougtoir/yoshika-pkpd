@@ -11,6 +11,14 @@ regional anesthesia:
 
 yoshika allows selecting the initial compartment to simulate these clinically
 distinct scenarios and compare their pharmacokinetic profiles.
+
+Clinical mapping:
+  - Epidural administration can be approximated using the Depot compartment,
+    as the absorption from the epidural space follows approximately first-order
+    kinetics (vascular uptake from epidural venous plexus).
+  - Spinal (intrathecal) administration is not modeled, as it is predominantly
+    a single-shot technique with small doses and involves unique CSF-based
+    pharmacokinetics that differ from the peripheral compartment model.
 """
 
 __version__ = "0.1.0"

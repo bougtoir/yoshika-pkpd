@@ -21,6 +21,17 @@ class Compartment(Enum):
             Drug enters here in successful regional blocks.
         DEPOT: Absorption compartment for first-order absorption kinetics.
             Models the injection site before drug enters the systemic circulation.
+            Also used to approximate epidural administration, where drug is
+            absorbed from the epidural space into systemic circulation via
+            the epidural venous plexus (approximately first-order kinetics).
+
+    Note:
+        Spinal (intrathecal) administration is not modeled in the current
+        version. Intrathecal injection delivers drug directly into the CSF
+        with unique pharmacokinetics (CSF spread, direct spinal cord uptake)
+        that differ from the peripheral compartment model. Spinal anesthesia
+        is predominantly a single-shot technique with small doses, making
+        systemic toxicity modeling less clinically relevant.
     """
 
     PLASMA = "plasma"

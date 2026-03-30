@@ -100,7 +100,28 @@ fig.savefig("comparison.png", dpi=150)
 - `Compartment.PLASMA` — IV administration (traditional model)
 - `Compartment.BRT` — Failed block / intravascular injection
 - `Compartment.BPT` — Successful peripheral block
-- `Compartment.DEPOT` — Depot absorption (fascial plane blocks)
+- `Compartment.DEPOT` — Depot absorption (fascial plane blocks, **epidural administration**)
+
+### Epidural Administration
+
+Epidural administration can be approximated using the **Depot compartment** (`Compartment.DEPOT`). In epidural anesthesia, the drug is injected into the epidural space and is absorbed into the systemic circulation primarily through epidural venous plexus uptake, with concurrent diffusion across the dura into the CSF. This absorption process follows approximately first-order kinetics, which is modeled by the depot compartment's absorption rate constant (ka). While the actual epidural pharmacokinetics involves parallel pathways (vascular absorption, dural penetration, and epidural fat sequestration), the depot model provides a reasonable first-order approximation of the systemic absorption phase.
+
+Users can adjust the `ka` parameter to match published epidural absorption rates for specific local anesthetics.
+
+### Spinal (Intrathecal) Administration
+
+Spinal (subarachnoid) administration is **not modeled** in the current version. Intrathecal injection delivers drug directly into the cerebrospinal fluid (CSF), involving unique pharmacokinetics (CSF spread, direct spinal cord uptake, and subsequent systemic absorption) that differ fundamentally from the peripheral compartment model. Additionally, spinal anesthesia is predominantly a single-shot technique with relatively small doses (e.g., bupivacaine 10–15 mg), making systemic toxicity modeling less clinically relevant compared to larger-dose peripheral nerve blocks and epidural techniques.
+
+## Clinical Scenario Mapping
+
+| Clinical Scenario | Initial Compartment | Rationale |
+|---|---|---|
+| IV injection | `Compartment.PLASMA` | Drug enters central circulation directly |
+| Failed nerve block (intravascular) | `Compartment.BRT` | Accidental injection into vessel-rich tissue |
+| Successful peripheral nerve block | `Compartment.BPT` | Drug deposited in vessel-poor tissue around nerves |
+| Fascial plane block | `Compartment.DEPOT` | Absorption from tissue plane via first-order kinetics |
+| Epidural administration | `Compartment.DEPOT` | Approximate: absorption from epidural space via first-order kinetics |
+| Spinal (intrathecal) | *Not supported* | Requires CSF compartment (not implemented) |
 
 ## API Reference
 

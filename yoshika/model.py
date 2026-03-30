@@ -92,7 +92,21 @@ class PKModel:
       - PLASMA: Traditional IV administration
       - BRT: Failed block (intravascular injection into vascular tissue)
       - BPT: Successful peripheral nerve block
-      - DEPOT: Injection site with first-order absorption
+      - DEPOT: Injection site with first-order absorption (also used to
+        approximate epidural administration)
+
+    Note on epidural administration:
+        Epidural administration can be approximated using the DEPOT
+        compartment. The drug injected into the epidural space is absorbed
+        into systemic circulation primarily via epidural venous plexus
+        uptake, following approximately first-order kinetics. Users can
+        adjust ka to match published epidural absorption rates.
+
+    Note on spinal (intrathecal) administration:
+        Spinal administration is not modeled. It is predominantly a
+        single-shot technique with small doses (e.g., bupivacaine 10-15 mg)
+        and involves unique CSF-based pharmacokinetics that differ from
+        the peripheral compartment model.
     """
 
     def __init__(
