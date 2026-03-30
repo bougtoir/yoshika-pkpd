@@ -39,7 +39,6 @@ class PDResult:
         idx = int(np.argmax(self.effect))
         return float(self.time[idx])
 
-    @property
     def onset_time(self, threshold: float = 50.0) -> float:
         """Time to reach threshold effect level (min).
 
@@ -55,7 +54,6 @@ class PDResult:
             return float("inf")
         return float(self.time[above[0]])
 
-    @property
     def duration_above_threshold(self, threshold: float = 50.0) -> float:
         """Duration of effect above threshold (min).
 

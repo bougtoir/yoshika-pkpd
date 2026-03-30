@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
+from typing import Dict, Union
 
 from yoshika.compartments import Compartment
 
@@ -97,7 +97,7 @@ class DrugParameters:
 # Drug parameter database
 # ─────────────────────────────────────────────────────────────────────────────
 
-_DRUG_DB: Dict[Drug, DrugParameters] = {
+_DRUG_DB: Dict[Union[Drug, str], DrugParameters] = {
     Drug.LIDOCAINE: DrugParameters(
         name="Lidocaine",
         v1=12.0,
@@ -210,11 +210,11 @@ class DrugLibrary:
         return _DRUG_DB[drug]
 
     @staticmethod
-    def list_drugs() -> list[Drug]:
+    def list_drugs() -> list[Union[Drug, str]]:
         """List all available drugs in the database.
 
         Returns:
-            List of Drug enum members.
+            List of Drug enum members and custom drug string keys.
         """
         return list(_DRUG_DB.keys())
 
@@ -233,15 +233,18 @@ class DrugLibrary:
         """
         name_lower = name.lower().strip()
         for drug, params in _DRUG_DB.items():
-            if drug.value == name_lower or params.name.lower() == name_lower:
+            key = drug.value if isinstance(drug, Drug) else drug
+            if key.lower() == name_lower or params.name.lower() == name_lower:
                 return params
-        available = [d.value for d in _DRUG_DB]
+        available = [
+            d.value if isinstance(d, Drug) else d for d in _DRUG_DB
+        ]
         raise KeyError(
             f"Drug '{name}' not found. Available: {available}"
         )
 
     @staticmethod
-    def add_custom_drug(drug_key: str, params: DrugParameters) -> Drug:
+    def add_custom_drug(drug_key: str, params: DrugParameters) -> str:
         """Register a custom drug in the database.
 
         This allows users to add drugs not included in the default library.
@@ -251,16 +254,16 @@ class DrugLibrary:
             params: DrugParameters instance with all PK/PD parameters.
 
         Returns:
-            The Drug enum-like key used to reference this drug.
+            The string key used to reference this drug. The drug can be
+            retrieved using DrugLibrary.get_by_name().
 
         Note:
             Custom drugs are stored using the string key and can be
-            retrieved using DrugLibrary.get_by_name().
+            retrieved using DrugLibrary.get_by_name(drug_key) or
+            DrugLibrary.get_by_name(params.name).
         """
-        # For custom drugs, we store them directly in the database dict
-        # using a synthetic key approach
-        _DRUG_DB[drug_key] = params  # type: ignore[index]
-        return drug_key  # type: ignore[return-value]
+        _DRUG_DB[drug_key] = params
+        return drug_key
 
     @staticmethod
     def get_absorption_rates() -> Dict[str, Dict[Compartment, float]]:
