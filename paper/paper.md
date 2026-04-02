@@ -10,10 +10,10 @@ tags:
   - simulation
 authors:
   - name: Tatsuki Onishi
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-7261-9062
     affiliation: 1
 affiliations:
-  - name: "[Affiliation]"
+  - name: Data Science and AI Innovation Research Promotion Center, Shiga University
     index: 1
 date: 28 March 2026
 bibliography: paper.bib
@@ -31,7 +31,7 @@ bibliography: paper.bib
 | C6 | Software code languages, tools, and services used | Python |
 | C7 | Compilation requirements, operating environments & dependencies | Python >= 3.9, NumPy, SciPy, Matplotlib |
 | C8 | Link to developer documentation/manual | <https://github.com/bougtoir/wip/blob/master/README.md> |
-| C9 | Support email for questions | [To be completed] |
+| C9 | Support email for questions | bougtoir@gmail.com |
 
 # Abstract
 
@@ -362,6 +362,6 @@ relationships that could have appeared to influence the work reported in this pa
 
 # Acknowledgements
 
-[To be completed]
+None.
 
 # References
