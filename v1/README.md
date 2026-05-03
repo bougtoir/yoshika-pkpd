@@ -1,6 +1,6 @@
 # v1 — CMPB Update Submission Materials
 
-This directory contains the final manuscript and reproduction code for the
+This directory contains the final manuscript and figure reproduction code for the
 CMPB Update (Computer Methods and Programs in Biomedicine Update) submission.
 
 ## Contents
@@ -8,29 +8,28 @@ CMPB Update (Computer Methods and Programs in Biomedicine Update) submission.
 ```
 v1/
 ├── README.md                  # This file
-├── paper.md                   # Manuscript source (Pandoc Markdown, Vancouver citations)
+├── paper.md                   # Manuscript source (Pandoc Markdown)
 ├── paper.bib                  # Bibliography (BibTeX)
-├── generate_manuscript.py     # Script to generate .docx and .pptx from figures
-├── figures/                   # All manuscript figures (PNG)
+├── reproduce_figures.py       # Reproduce all manuscript figures using yoshika
+├── figures/                   # Manuscript figures (PNG, 300 dpi)
 │   ├── fig1_compartment_diagram_plasma.png
 │   ├── fig2_bupivacaine_comparison.png
 │   ├── fig3_all_drugs_comparison.png
 │   ├── fig4_bupivacaine_effect.png
 │   ├── fig5_bupivacaine_bpt_full.png
 │   └── fig6_summary_table.png
-└── output/                    # Generated deliverables
+└── output/                    # Pre-generated submission files
     ├── yoshika_CMPB_Update_manuscript.docx
     └── yoshika_CMPB_Update_figures.pptx
 ```
 
-## Reproducing the .docx and .pptx
+## Reproducing the figures
 
 ```bash
-pip install python-docx python-pptx Pillow
+pip install yoshika matplotlib pandas
 cd v1
-python generate_manuscript.py
+python reproduce_figures.py
 ```
 
-This generates:
-- `output/yoshika_CMPB_Update_manuscript.docx` — Full manuscript with inline figures and Vancouver-style numbered references (superscript)
-- `output/yoshika_CMPB_Update_figures.pptx` — Editable figures (one per slide, widescreen 13.333 x 7.5 in)
+This regenerates all six figures in `figures/` using the yoshika PKPD package
+with bupivacaine 150 mg / 70 kg as the reference scenario.
