@@ -22,8 +22,8 @@ pip install yoshika
 Or install from source:
 
 ```bash
-git clone https://github.com/bougtoir/wip.git
-cd wip
+git clone https://github.com/bougtoir/yoshika-pkpd.git
+cd yoshika-pkpd
 pip install -e ".[dev]"
 ```
 
@@ -173,10 +173,10 @@ MIT License
 If you use yoshika in your research, please cite:
 
 ```bibtex
-@article{yoshika2025,
+@article{yoshika2026,
   title={yoshika: A Python Package for Pharmacokinetic-Pharmacodynamic Simulation of Local Anesthetics with Selectable Initial Compartment},
   author={Onishi, Tatsuki},
-  year={2025},
-  journal={Journal of Open Source Software}
+  year={2026},
+  journal={Computer Methods and Programs in Biomedicine Update}
 }
 ```

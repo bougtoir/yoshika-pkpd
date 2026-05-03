@@ -1,37 +1,26 @@
 ---
 title: 'yoshika: A Python Package for Pharmacokinetic-Pharmacodynamic Simulation of Local Anesthetics with Selectable Initial Compartment'
-tags:
-  - Python
-  - pharmacokinetics
-  - pharmacodynamics
-  - local anesthetics
-  - regional anesthesia
-  - compartment model
-  - simulation
-authors:
+author:
   - name: Tatsuki Onishi
     orcid: 0000-0001-7261-9062
     affiliation: 1
+    corresponding: true
+    email: bougtoir@gmail.com
 affiliations:
   - name: Data Science and AI Innovation Research Promotion Center, Shiga University
     index: 1
-date: 28 March 2026
+date: 2026
 bibliography: paper.bib
+csl: computer-methods-and-programs-in-biomedicine.csl
 ---
 
-# Code Metadata
+# Highlights
 
-| Nr. | Code metadata description | Value |
-|:----|:--------------------------|:------|
-| C1 | Current code version | v0.1.0 |
-| C2 | Permanent link to code/repository | <https://github.com/bougtoir/wip> |
-| C3 | Permanent link to Reproducible Capsule | |
-| C4 | Legal Code License | MIT |
-| C5 | Code versioning system used | git |
-| C6 | Software code languages, tools, and services used | Python |
-| C7 | Compilation requirements, operating environments & dependencies | Python >= 3.9, NumPy, SciPy, Matplotlib |
-| C8 | Link to developer documentation/manual | <https://github.com/bougtoir/wip/blob/master/README.md> |
-| C9 | Support email for questions | bougtoir@gmail.com |
+- First open-source PKPD simulator with selectable initial compartment for local anesthetics
+- Simulates clinically distinct scenarios: successful block, failed block, IV, and depot
+- Supports context-sensitive maximum dose framework for regional anesthesia safety
+- Built-in parameters for lidocaine, bupivacaine, ropivacaine, and levobupivacaine
+- Demonstrates route-adaptive PKPD integration feasibility for anesthesia information systems
 
 # Abstract
 
@@ -51,14 +40,14 @@ initial compartment determines peak plasma concentration and time-to-toxicity, y
 the concept of context-sensitive maximum dose recommendations and route-adaptive PKPD simulation
 in anesthesia information management systems.
 
-**Keywords:** pharmacokinetics, pharmacodynamics, local anesthetics, regional anesthesia,
-compartment model, simulation, Python, initial compartment, systemic toxicity
+**Keywords:** pharmacokinetics; pharmacodynamics; local anesthetics; regional anesthesia;
+compartment model; simulation; Python; systemic toxicity
 
-# 1. Motivation and significance
+# 1. Introduction
 
-## 1.1 The initial compartment problem in regional anesthesia
+## 1.1. The initial compartment problem in regional anesthesia
 
-In regional anesthesia and pain medicine, local anesthetics are injected near nerves and
+In regional anesthesia and pain medicine, local anesthetics (LAs) are injected near nerves and
 fascial planes rather than intravenously. The pharmacokinetic behavior of these drugs
 depends critically on the injection site and block success. Existing PK simulation tools
 (e.g., STANPUMP, Tivatrainer, Eleveld models) uniformly assume intravenous administration,
@@ -75,16 +64,41 @@ assumption does not hold for regional anesthesia, where:
   with first-order absorption kinetics ($k_a$).
 
 To our knowledge, no existing open-source PKPD simulation package explicitly supports
-selectable initial compartment for local anesthetics. The Python Anesthesia Simulator
-(PAS) [@jeanneteau2024] provides a general framework for anesthetic PK simulation but does
-not address the specific problem of initial compartment selection for regional anesthesia
-applications.
+selectable initial compartment for local anesthetics.
 
-## 1.2 Clinical significance: initial compartment as a determinant of systemic toxicity risk
+## 1.2. Physicochemical basis of compartmental drug distribution
+
+The pharmacokinetic behavior of LAs across tissue compartments is fundamentally governed by
+their physicochemical properties, particularly lipophilicity and ionization state. Strichartz
+et al. systematically measured octanol/buffer partition coefficients and pKa values for
+clinically used LAs, demonstrating that lipophilicity---as quantified by the partition
+coefficient---and temperature-dependent ionization are primary determinants of tissue
+distribution and nerve-blocking potency [@strichartz1990]. Their finding that the protonated
+species concentration in lipid remains nearly constant upon cooling, while the neutral species
+concentration decreases substantially, provided a physicochemical explanation for the increased
+blocking potency of LAs at lower temperatures.
+
+Building on these fundamental properties, Kavčič et al. applied quantum chemical calculations
+to model the transfer energetics of seven LAs from extracellular fluid across the biological
+membrane to the axoplasm, demonstrating that LA transfer between compartments relies on pH
+differences and affinities toward lipophilic compartments [@kavcic2021]. Their computational
+analysis showed that LAs are stored in Schwann cell membranes, adipose tissue, and other
+lipophilic compartments, from which they are slowly released---a process directly relevant
+to the vessel-poor tissue (BPT) compartment in pharmacokinetic models. Furthermore, local
+acidosis reduces LA storage in lipophilic compartments, decreasing the duration of action,
+while more lipophilic LAs (e.g., bupivacaine) exhibit greater storage capacity and longer
+duration.
+
+These physicochemical principles provide the theoretical foundation for the compartmental
+modeling approach implemented in yoshika: the initial compartment of drug deposition
+determines the subsequent absorption kinetics because tissue-specific lipophilicity and pH
+govern the rate of drug transfer between compartments.
+
+## 1.3. Clinical significance: systemic toxicity risk and context-sensitive dosing
 
 The clinical significance of selectable initial compartment modeling lies in its
 direct implications for local anesthetic systemic toxicity (LAST) risk assessment.
-Traditional maximum recommended doses for local anesthetics (e.g., bupivacaine
+Traditional maximum recommended doses for LAs (e.g., bupivacaine
 2 mg/kg, lidocaine 4.5 mg/kg without epinephrine) are derived from intravenous
 pharmacokinetic studies, where the entire dose enters the central plasma compartment
 instantaneously [@rosenberg2004; @decassai2025]. This assumption produces the
@@ -108,13 +122,10 @@ synonymous descriptions without positive or negative connotations---they
 represent neutral descriptions of drug disposition based on the anatomical
 site of deposition.
 
-## 1.3 Context-sensitive maximum dose
-
-We propose that yoshika enables exploration of a *context-sensitive maximum dose*
-concept for local anesthetics, analogous to the context-sensitive half-time that
-transformed understanding of intravenous drug offset [@hughes1992]. Under this
-framework, the effective maximum safe dose is not a single fixed value but varies
-with the clinical scenario (\autoref{tab:context_dose}).
+We propose the concept of *context-sensitive maximum dose* for LAs, analogous
+to the context-sensitive half-time that transformed understanding of intravenous
+drug offset [@hughes1992]. Under this framework, the effective maximum safe dose
+is not a single fixed value but varies with the clinical scenario (Table 1).
 
 : Proposed context-sensitive maximum dose framework. \label{tab:context_dose}
 
@@ -132,28 +143,44 @@ regional anesthesia practice [@rosenberg2004]. When the block is successful, the
 drug is sequestered in vessel-poor tissue with slow systemic release---precisely
 the scenario where doses above traditional limits are routinely administered safely.
 
-## 1.4 Implications for anesthesia information management systems
+## 1.4. Existing anesthesia simulators and positioning of yoshika
 
-Modern anesthesia information management systems (AIMS) increasingly incorporate
-real-time PKPD displays for intravenous agents (e.g., propofol, remifentanil)
-using standard three-compartment models that assume central compartment input
-[@eleveld2018]. When the same AIMS tracks local anesthetic doses administered via
-regional techniques, the underlying PK model remains unchanged, producing
-predictions based on IV kinetics that may significantly overestimate peak plasma
-concentrations after successful regional blocks.
+Several open-source anesthesia simulation tools exist, but none address the specific
+problem of initial compartment selection for local anesthetics in regional anesthesia.
 
-yoshika demonstrates that route-adaptive PKPD simulation---adjusting the initial
-compartment based on the documented administration route---is computationally
-straightforward and can be integrated into existing AIMS infrastructure. The
-mathematical framework (depot-augmented compartment models with first-order
-absorption) is well-established and computationally inexpensive. The principal
-barrier to implementation is not technical but conceptual: the recognition that
-a single pharmacokinetic model cannot adequately describe drug behavior across
-fundamentally different routes of administration.
+The Python Anesthesia Simulator (PAS) [@aubouin2023] provides a general framework for
+simulating the effects of propofol, remifentanil, and norepinephrine during total
+intravenous anesthesia (TIVA). PAS is designed as a benchmark for the control community
+to design multidrug controllers, with pharmacokinetic models (Schnider, Marsh, Eleveld)
+that uniformly assume central compartment input.
 
-# 2. Software description
+The Anesthesia Response Simulator (AReS) [@hosseinirad2025] extends TIVA simulation
+to propofol, remifentanil, norepinephrine, and rocuronium, with target-controlled
+infusion modules and surgical stimulus profiles. AReS is available in both Python
+and MATLAB and focuses on automated anesthesia control testing.
 
-## 2.1 Software architecture
+The AMICAS simulator [@ionescu2021] provides a MATLAB/Simulink-based patient
+simulator for multi-drug dosing control during general anesthesia, incorporating
+complex synergistic and antagonistic interactions between hypnosis, analgesia, and
+hemodynamic variables.
+
+All three simulators focus exclusively on intravenous general anesthetics and assume
+drug administration into the central (plasma) compartment. None addresses local
+anesthetics or the problem of route-dependent initial compartment selection that is
+central to regional anesthesia pharmacokinetics. yoshika fills this gap by providing
+a simulation tool specifically designed for local anesthetics with selectable initial
+compartment.
+
+## 1.5. Aim
+
+The aim of this study is to present yoshika, an open-source Python package for
+PKPD simulation of local anesthetics with selectable initial compartment, and to
+demonstrate how the choice of initial compartment affects predicted plasma
+concentration profiles and toxicity risk across clinically relevant scenarios.
+
+# 2. Methods
+
+## 2.1. Software architecture
 
 yoshika is structured as a modular Python package with the following components:
 
@@ -167,9 +194,7 @@ yoshika is structured as a modular Python package with the following components:
 
 The package follows a clean separation of concerns: the PK model (ODE system) is independent of the PD model, and both are independent of the drug parameter database. This design allows users to substitute custom drug parameters, modify the PD model, or extend the compartment structure without affecting other components.
 
-## 2.2 Software functionalities
-
-### 2.2.1 Pharmacokinetic model
+## 2.2. Pharmacokinetic model
 
 yoshika implements a standard three-compartment mammillary PK model with an optional depot
 compartment. The system of ordinary differential equations (ODEs) is:
@@ -187,7 +212,7 @@ vessel-poor tissue (V3/BPT), respectively; $A_{depot}$ is the amount in the depo
 $k_{10}$ is the elimination rate constant; $k_{12}$, $k_{21}$, $k_{13}$, $k_{31}$ are
 intercompartmental transfer rate constants; and $k_a$ is the absorption rate constant from the depot.
 
-The initial conditions are set according to the selected compartment (\autoref{tab:initial_conditions}):
+The initial conditions are set according to the selected compartment (Table 2):
 
 : Initial conditions for each selectable compartment. \label{tab:initial_conditions}
 
@@ -202,7 +227,7 @@ The ODEs are solved numerically using `scipy.integrate.solve_ivp` with the RK45 
 (explicit Runge-Kutta of order 5(4), Dormand-Prince) [@virtanen2020]. Concentrations are
 computed as $C_i = A_i / V_i$ at each time point.
 
-### 2.2.2 Pharmacodynamic model
+## 2.3. Pharmacodynamic model
 
 yoshika includes an effect-site compartment linked to the central compartment via a
 first-order rate constant $k_{e0}$:
@@ -214,7 +239,7 @@ The drug effect is computed using a sigmoid Emax model:
 
 $$E = E_{max} \cdot \frac{C_e^{\gamma}}{EC_{50}^{\gamma} + C_e^{\gamma}}$$
 
-### 2.2.3 Drug database
+## 2.4. Drug parameter database
 
 The package includes pharmacokinetic parameters for four commonly used local anesthetics:
 lidocaine, bupivacaine, ropivacaine, and levobupivacaine [@tucker1979; @burm1989]. Parameters
@@ -223,7 +248,7 @@ equilibration rate ($k_{e0}$), $EC_{50}$, Hill coefficient ($\gamma$), protein b
 and toxicity thresholds for CNS and cardiovascular systems. Users can also define custom drug
 parameters via the `DrugLibrary.add_custom()` API.
 
-### 2.2.4 Epidural administration approximation
+## 2.5. Epidural administration approximation
 
 Epidural administration can be approximated using the Depot compartment in yoshika.
 In epidural anesthesia, the drug is injected into the epidural space and is absorbed
@@ -240,22 +265,13 @@ specific local anesthetics. For example, epidural lidocaine has a reported syste
 absorption half-life of approximately 10--20 minutes, corresponding to $k_a$ values of
 0.035--0.069 min$^{-1}$.
 
-### 2.2.5 Limitations: spinal (intrathecal) administration
+# 3. Results
 
-Spinal (subarachnoid/intrathecal) administration is not modeled in the current version
-of yoshika. Intrathecal injection delivers drug directly into the cerebrospinal fluid
-(CSF), involving unique pharmacokinetics (CSF spread, direct spinal cord uptake, and
-subsequent systemic absorption) that differ fundamentally from the peripheral compartment
-model. Additionally, spinal anesthesia is predominantly a single-shot technique with
-relatively small doses (e.g., bupivacaine 10--15 mg), making systemic toxicity modeling
-less clinically relevant compared to larger-dose peripheral nerve blocks and epidural
-techniques.
+## 3.1. Comparison of plasma concentration profiles by initial compartment
 
-# 3. Illustrative examples
-
-The following example demonstrates the core functionality of yoshika: comparing plasma
-concentration profiles of bupivacaine 150 mg administered to a 70 kg patient across three
-initial compartment scenarios.
+Fig. 1 shows the three-compartment model with selectable initial compartment.
+To demonstrate the core functionality, bupivacaine 150 mg administered to a 70 kg patient
+was simulated across three initial compartment scenarios using the following code:
 
 ```python
 from yoshika import Simulator, Drug, Compartment
@@ -272,25 +288,32 @@ fig, ax = plot_comparison(results, drug_params=params)
 fig.savefig("comparison.png", dpi=300)
 ```
 
-\autoref{fig:compartment} shows the three-compartment model with selectable initial compartment.
-\autoref{fig:bupivacaine} demonstrates the dramatic differences in plasma concentration-time
+Fig. 2 demonstrates the dramatic differences in plasma concentration-time
 profiles when bupivacaine 150 mg is administered to the same patient but with different initial
 compartments. The plasma-start scenario (equivalent to IV bolus) produces the highest and earliest
 Cmax, exceeding the CNS toxicity threshold. The BRT-start scenario (failed block) shows intermediate
 kinetics, while the BPT-start scenario (successful block) produces the lowest and most delayed Cmax,
 remaining below toxicity thresholds throughout.
 
-\autoref{fig:all_drugs} extends this comparison to all four local anesthetics.
-\autoref{fig:effect} shows the effect-site concentration and pharmacodynamic response for
-bupivacaine across initial compartments. \autoref{fig:full_profile} shows the full
-compartment concentration profile for bupivacaine from BPT. \autoref{tab:summary} provides
-a PK/PD summary table comparing key parameters across initial compartments.
-
 ![Three-compartment model with selectable initial compartment (plasma highlighted).\label{fig:compartment}](figures/fig1_compartment_diagram_plasma.png){ width=80% }
 
 ![Bupivacaine 150 mg -- Plasma concentration by initial compartment with toxicity thresholds.\label{fig:bupivacaine}](figures/fig2_bupivacaine_comparison.png){ width=80% }
 
+## 3.2. Cross-drug comparison
+
+Fig. 3 extends the comparison to all four local anesthetics (lidocaine, bupivacaine,
+ropivacaine, levobupivacaine), showing that the effect of initial compartment selection on
+plasma concentration profiles is consistent across drugs with different pharmacokinetic
+parameters.
+
 ![Plasma concentration comparison for all four local anesthetics by initial compartment.\label{fig:all_drugs}](figures/fig3_all_drugs_comparison.png){ width=80% }
+
+## 3.3. Pharmacodynamic response
+
+Fig. 4 shows the effect-site concentration and pharmacodynamic response for
+bupivacaine across initial compartments. Fig. 5 shows the full
+compartment concentration profile for bupivacaine from BPT. Table 3 provides
+a PK/PD summary comparing key parameters across initial compartments.
 
 ![Bupivacaine -- Effect-site response by initial compartment.\label{fig:effect}](figures/fig4_bupivacaine_effect.png){ width=80% }
 
@@ -298,42 +321,94 @@ a PK/PD summary table comparing key parameters across initial compartments.
 
 ![Bupivacaine 150 mg -- PK/PD summary by initial compartment.\label{tab:summary}](figures/fig6_summary_table.png){ width=80% }
 
-# 4. Impact
+# 4. Discussion
+
+## 4.1. Clinical implications
 
 yoshika addresses a gap in the pharmacokinetic simulation landscape by providing the first
 open-source tool that allows users to select the initial compartment of drug deposition for
-local anesthetics. The impact of this software extends across several domains:
+local anesthetics. The impact of this software extends across several domains.
 
-**Clinical pharmacology and toxicology.** By quantifying how the initial compartment
+In clinical pharmacology and toxicology, by quantifying how the initial compartment
 determines peak plasma concentration and time-to-toxicity, yoshika provides a computational
 basis for reconsidering maximum recommended doses of local anesthetics. The context-sensitive
-maximum dose framework (\autoref{tab:context_dose}) challenges the longstanding practice of
+maximum dose framework (Table 1) challenges the longstanding practice of
 applying IV-derived mg/kg limits to regional anesthesia, where absorption kinetics differ
 fundamentally from intravenous administration.
 
-**Anesthesia information management systems.** yoshika demonstrates that route-adaptive PKPD
-simulation is computationally feasible with standard ODE solvers and can be integrated into
-existing AIMS infrastructure. This provides a proof-of-concept for AIMS vendors seeking to
-implement administration-route-specific pharmacokinetic predictions.
+In anesthesia information management systems (AIMS), yoshika demonstrates that route-adaptive
+PKPD simulation is computationally feasible with standard ODE solvers and can be integrated
+into existing AIMS infrastructure. This provides a proof-of-concept for AIMS vendors seeking
+to implement administration-route-specific pharmacokinetic predictions. Modern AIMS increasingly
+incorporate real-time PKPD displays for intravenous agents (e.g., propofol, remifentanil) using
+standard three-compartment models that assume central compartment input [@eleveld2018]. When the
+same AIMS tracks local anesthetic doses administered via regional techniques, the underlying PK
+model remains unchanged, producing predictions based on IV kinetics that may significantly
+overestimate peak plasma concentrations after successful regional blocks.
 
-**Clinical decision support.** Block success can serve as a real-time pharmacokinetic risk
-indicator. If block success is inferred from clinical assessment (e.g., onset of sensory
-block within expected timeframes), clinicians could update their toxicity risk assessment
-in real time using yoshika's simulation framework. A confirmed successful block indicates
-a low-risk pharmacokinetic trajectory (slow absorption from BPT), while failure to achieve
-blockade should prompt heightened vigilance and conservative redosing decisions.
+Block success can serve as a real-time pharmacokinetic risk indicator. If block success is
+inferred from clinical assessment (e.g., onset of sensory block within expected timeframes),
+clinicians could update their toxicity risk assessment in real time using yoshika's simulation
+framework.
 
-**Education and training.** yoshika provides an interactive simulation environment for
-anesthesia trainees to visualize how different injection sites and block outcomes affect
-drug disposition, reinforcing the pharmacokinetic principles underlying safe regional
-anesthesia practice.
+## 4.2. Comparison with existing anesthesia simulators
 
-**Research.** The modular design of yoshika facilitates extension to new drug models,
-custom compartment configurations, and population pharmacokinetic analyses. Future research
-directions include systematic measurement of plasma concentration profiles after various
-regional block types with concurrent documentation of block success, to parameterize
-compartment-specific absorption models, and prospective validation of the context-sensitive
-maximum dose framework.
+Table 4 summarizes the positioning of yoshika relative to existing open-source
+anesthesia simulators.
+
+: Comparison of open-source anesthesia simulators. \label{tab:comparison}
+
+| Feature | PAS | AReS | AMICAS | yoshika |
+|:--------|:----|:-----|:-------|:--------|
+| Drug class | General (propofol, remifentanil) | General (propofol, remifentanil, rocuronium) | General (propofol, remifentanil) | **Local anesthetics** |
+| Administration route | IV only | IV only | IV only | **Selectable** (IV, BRT, BPT, Depot) |
+| Language | Python | Python/MATLAB | MATLAB/Simulink | Python |
+| PD model | BIS, MAP, CO | BIS, MAP, CO, NMB | BIS, MAP, CO | Sigmoid Emax (nerve block) |
+| Target application | TIVA drug control | Automated anesthesia testing | Multi-drug dosing control | Regional anesthesia PKPD |
+| License | Open source | MIT | Open source | MIT |
+
+The key differentiator of yoshika is its focus on local anesthetics and the selectable initial
+compartment, which addresses a fundamentally different clinical scenario (regional anesthesia)
+from the IV general anesthesia focus of existing tools.
+
+## 4.3. Limitations
+
+Several limitations should be acknowledged.
+
+First, the pharmacokinetic parameters used in yoshika are derived from intravenous
+pharmacokinetic studies [@tucker1979]. When these parameters are applied to non-IV routes
+(BRT, BPT, Depot), the intercompartmental transfer rate constants ($k_{12}$, $k_{21}$,
+$k_{13}$, $k_{31}$) are assumed to remain unchanged regardless of the initial compartment.
+This assumption has not been validated with clinical data from regional anesthesia and
+represents a simplification of the underlying pharmacokinetics.
+
+Second, the three-compartment model does not capture the full complexity of LA tissue
+pharmacokinetics. In reality, LA distribution involves pH-dependent ionization equilibria
+[@strichartz1990; @kavcic2021], binding to tissue proteins and lipids,
+and site-specific absorption pathways that vary with anatomical location. The compartmental
+model provides a macroscopic approximation of these processes.
+
+Third, spinal (subarachnoid/intrathecal) administration is not modeled in the current version.
+Intrathecal injection delivers drug directly into the cerebrospinal fluid (CSF), involving
+unique pharmacokinetics (CSF spread, direct spinal cord uptake, and subsequent systemic
+absorption) that differ fundamentally from the peripheral compartment model. Additionally,
+spinal anesthesia is predominantly a single-shot technique with relatively small doses (e.g.,
+bupivacaine 10--15 mg), making systemic toxicity modeling less clinically relevant compared to
+larger-dose peripheral nerve blocks and epidural techniques.
+
+Fourth, the current version does not implement population pharmacokinetic variability or
+covariate models (e.g., age, hepatic function, cardiac output). Individual patient parameters
+can be customized through the API, but systematic population modeling is not yet supported.
+
+## 4.4. Future directions
+
+Future development directions include systematic measurement of plasma concentration profiles
+after various regional block types with concurrent documentation of block success, to
+parameterize compartment-specific absorption models. Prospective validation of the
+context-sensitive maximum dose framework would require clinical studies correlating block
+success, administered dose, and measured plasma concentrations. Integration of population
+pharmacokinetic models and covariate-based parameter adjustment would enhance clinical
+applicability.
 
 # 5. Conclusions
 
@@ -349,7 +424,15 @@ The clinical significance of this approach is substantial: traditional mg/kg dos
 derived from IV pharmacokinetics do not account for the fundamentally different absorption
 kinetics of regional anesthesia. yoshika quantifies these differences and supports the
 development of evidence-based, route-specific dose guidelines. The software is freely
-available under the MIT license and can be installed via pip.
+available under the MIT license at <https://github.com/bougtoir/yoshika-pkpd> and can be
+installed via pip.
+
+# Software availability
+
+The source code for yoshika is publicly available at <https://github.com/bougtoir/yoshika-pkpd>
+under the MIT license. The package requires Python >= 3.9 with NumPy, SciPy, Matplotlib, and
+Pandas as dependencies. Installation is available via `pip install yoshika` or from source.
+Documentation and usage examples are provided in the repository README.
 
 # Declaration of competing interest
 

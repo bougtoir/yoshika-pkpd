@@ -50,7 +50,7 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/bougtoir/wip"
+Repository = "https://github.com/bougtoir/yoshika-pkpd"
 
 [tool.setuptools.packages.find]
 include = ["yoshika*"]
