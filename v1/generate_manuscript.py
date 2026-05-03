@@ -728,7 +728,8 @@ def generate_docx():
         "kinetics of regional anesthesia. yoshika quantifies these differences and supports the "
         "development of evidence-based, route-specific dose guidelines. The software is freely "
         "available under the MIT license at https://github.com/bougtoir/yoshika-pkpd and can be "
-        "installed via pip."
+        "installed via pip. The manuscript source and reproduction code are available at "
+        "https://github.com/bougtoir/yoshika-pkpd/tree/main/v1."
     )
 
     # ===== SOFTWARE AVAILABILITY =====
@@ -737,7 +738,9 @@ def generate_docx():
         "The source code for yoshika is publicly available at https://github.com/bougtoir/yoshika-pkpd "
         "under the MIT license. The package requires Python >= 3.9 with NumPy, SciPy, Matplotlib, and "
         "Pandas as dependencies. Installation is available via pip install yoshika or from source. "
-        "Documentation and usage examples are provided in the repository README."
+        "Documentation and usage examples are provided in the repository README. "
+        "The manuscript source, figures, and reproduction scripts are available at "
+        "https://github.com/bougtoir/yoshika-pkpd/tree/main/v1."
     )
 
     # ===== DECLARATIONS =====
