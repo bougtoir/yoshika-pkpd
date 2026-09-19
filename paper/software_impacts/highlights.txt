@@ -1,0 +1,7 @@
+Highlights
+
+- Open-source Python PKPD package for local anesthetics with selectable route
+- The user selects the initial compartment: plasma, tissue, or depot
+- Shared disposition parameters isolate the effect of the administration route
+- Validated vs 10 published datasets: 90% of Cmax within two-fold (GMFE 1.51)
+- IV-input assumption overstates Cmax ~10-fold and mis-times the peak (Tmax=0)

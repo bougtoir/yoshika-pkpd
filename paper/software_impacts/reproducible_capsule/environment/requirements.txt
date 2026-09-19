@@ -1,0 +1,9 @@
+# Pinned environment for the yoshika reproducible capsule.
+# yoshika 0.1.0 is published on PyPI; its runtime dependencies
+# (numpy, scipy, matplotlib, pandas) are pulled in automatically,
+# but are listed here with lower bounds matching pyproject.toml for clarity.
+yoshika==0.1.0
+numpy>=1.21
+scipy>=1.7
+matplotlib>=3.5
+pandas>=1.3
